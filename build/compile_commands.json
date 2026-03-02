@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/elzsh/Dev/chippy/build",
+  "command": "/usr/bin/c++  -I/home/elzsh/Dev/chippy/include -std=gnu++20 -o CMakeFiles/chippy.dir/src/main.cpp.o -c /home/elzsh/Dev/chippy/src/main.cpp",
+  "file": "/home/elzsh/Dev/chippy/src/main.cpp",
+  "output": "CMakeFiles/chippy.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/elzsh/Dev/chippy/build",
+  "command": "/usr/bin/c++  -I/home/elzsh/Dev/chippy/include -std=gnu++20 -o CMakeFiles/chippy.dir/src/chip8.cpp.o -c /home/elzsh/Dev/chippy/src/chip8.cpp",
+  "file": "/home/elzsh/Dev/chippy/src/chip8.cpp",
+  "output": "CMakeFiles/chippy.dir/src/chip8.cpp.o"
+}
+]

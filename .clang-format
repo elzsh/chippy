@@ -1,0 +1,32 @@
+# BasedOnStyle: LLVM is the foundation for most industry standards
+BasedOnStyle: LLVM
+
+# Use 4 spaces for indentation (Industry standard for readability)
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Modern displays handle 100-120 chars easily; 80 is often too cramped
+ColumnLimit: 80
+
+# Ensure curly braces are on the same line for blocks (K&R style)
+BreakBeforeBraces: Attach
+
+# Clean up includes automatically
+SortIncludes: true
+IncludeBlocks: Regroup
+
+# Readability: Don't squeeze everything onto one line
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# Pointer alignment (Left is standard for C++, e.g., int* p)
+# Change to 'Right' if you prefer C-style (e.g., int *p)
+PointerAlignment: Left
+
+# Space before parentheses in control statements (if, for, while)
+SpaceBeforeParens: ControlStatements
+
+# Add a newline at the end of the file
+InsertNewlineAtEOF: true

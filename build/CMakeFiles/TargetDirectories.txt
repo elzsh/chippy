@@ -1,0 +1,3 @@
+/home/elzsh/Dev/chippy/build/CMakeFiles/chippy.dir
+/home/elzsh/Dev/chippy/build/CMakeFiles/edit_cache.dir
+/home/elzsh/Dev/chippy/build/CMakeFiles/rebuild_cache.dir
