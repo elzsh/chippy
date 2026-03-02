@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/elzsh/Dev/chippy/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
