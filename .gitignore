@@ -39,3 +39,15 @@
 
 # debug information files
 *.dwo
+
+# CMake build directory
+build/
+
+# clangd LSP cache
+.cache/
+
+# CMake compilation database (generated)
+compile_commands.json
+
+# JetBrains IDEs (CLion, etc.)
+.idea/
