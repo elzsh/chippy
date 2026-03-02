@@ -1,9 +1,13 @@
 #include <algorithm>
 #include <chip8.h>
+#include <cstddef>
 #include <cstdint>
-#include <iterator>
+#include <filesystem>
+#include <fstream>
+#include <ios>
 
-constexpr uint8_t fontset[80] = {
+namespace {
+constexpr std::array<uint8_t, 80> FONTSET = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -21,9 +25,48 @@ constexpr uint8_t fontset[80] = {
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
+}
+
+void Chip8::reset() {
+    memory.fill(0);
+    display.fill(0);
+    keypad.fill(0);
+    registers.fill(0);
+    stack.fill(0);
+
+    pc = START_ADDRESS;
+    opcode = 0;
+    index = 0;
+    sp = 0;
+    delay_timer = 0;
+    sound_timer = 0;
+
+    std::copy(FONTSET.begin(), FONTSET.end(), memory.begin() + FONTSET_ADDRESS);
+}
 
 Chip8::Chip8() {
-    std::copy(std::begin(fontset), std::end(fontset), memory + 0x50);
+    reset();
+}
 
-    pc = 0x200;
+bool Chip8::load_rom(const std::filesystem::path& filepath) {
+    std::ifstream rom(filepath, std::ios::binary | std::ios::ate);
+
+    if (!rom.is_open())
+        return false;
+
+    std::streamsize size = rom.tellg();
+    if (size <= 0)
+        return false;
+
+    const size_t max_allowed = MEMORY_SIZE - START_ADDRESS;
+    if (static_cast<size_t>(size) > max_allowed)
+        return false;
+
+    reset();
+    rom.seekg(0, std::ios::beg);
+
+    if (!rom.read(reinterpret_cast<char*>(memory.data() + START_ADDRESS), size))
+        return false;
+
+    return true;
 }
