@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <ios>
+#include <iostream>
 
 namespace {
 constexpr std::array<uint8_t, 80> FONTSET = {
@@ -69,4 +71,14 @@ bool Chip8::load_rom(const std::filesystem::path& filepath) {
         return false;
 
     return true;
+}
+
+void Chip8::tick() {
+    opcode = memory[pc & 0x0FFF] << 8 | memory[(pc + 1) & 0x0FFF];
+
+    std::cout << std::hex << std::setfill('0') << std::setw(4) << opcode
+              << '\n';
+
+    pc += 2;
+    pc &= 0x0FFF;
 }

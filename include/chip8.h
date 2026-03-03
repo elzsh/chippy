@@ -18,9 +18,11 @@ class Chip8 {
 
     bool load_rom(const std::filesystem::path& filepath);
 
+    void tick();
+
     std::array<uint8_t, 16> keypad{};
 
-    std::array<uint32_t, DISPLAY_WIDTH * DISPLAY_HEIGHT> display{};
+    std::array<uint8_t, DISPLAY_WIDTH * DISPLAY_HEIGHT> display{};
 
   private:
     uint16_t pc{START_ADDRESS};
