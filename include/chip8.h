@@ -5,7 +5,7 @@
 #include <filesystem>
 
 class Chip8 {
-  public:
+public:
     static constexpr size_t MEMORY_SIZE = 4096;
     static constexpr size_t START_ADDRESS = 0x200;
     static constexpr size_t FONTSET_ADDRESS = 0x50;
@@ -24,7 +24,7 @@ class Chip8 {
 
     std::array<uint8_t, DISPLAY_WIDTH * DISPLAY_HEIGHT> display{};
 
-  private:
+private:
     uint16_t pc{START_ADDRESS};
     uint16_t opcode{};
     uint16_t index{};

@@ -1,32 +1,74 @@
-# BasedOnStyle: LLVM is the foundation for most industry standards
 BasedOnStyle: LLVM
+Standard: c++20
 
-# Use 4 spaces for indentation (Industry standard for readability)
+# Indentation
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
+IndentAccessModifiers: false
+AccessModifierOffset: -4
+IndentCaseLabels: true
+NamespaceIndentation: None
 
-# Modern displays handle 100-120 chars easily; 80 is often too cramped
-ColumnLimit: 80
+# Line length
+ColumnLimit: 100
 
-# Ensure curly braces are on the same line for blocks (K&R style)
+# Braces
 BreakBeforeBraces: Attach
+Cpp11BracedListStyle: true
 
-# Clean up includes automatically
-SortIncludes: true
+# Includes
+SortIncludes: CaseSensitive
 IncludeBlocks: Regroup
 
-# Readability: Don't squeeze everything onto one line
-AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: false
+# Short statements
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortBlocksOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+AllowShortEnumsOnASingleLine: false
 
-# Pointer alignment (Left is standard for C++, e.g., int* p)
-# Change to 'Right' if you prefer C-style (e.g., int *p)
+# Pointers and references
 PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
 
-# Space before parentheses in control statements (if, for, while)
+# Spacing
 SpaceBeforeParens: ControlStatements
+SpaceAfterTemplateKeyword: true
+SpaceBeforeCpp11BracedList: false
+SpaceInEmptyBlock: false
+SpacesInAngles: Never
 
-# Add a newline at the end of the file
+# Arguments and parameters
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: BlockIndent
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Alignment
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+AlignConsecutiveMacros: Consecutive
+AlignEscapedNewlines: Left
+AlignOperands: Align
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1
+SpacesBeforeTrailingComments: 4
+
+# Lambdas
+LambdaBodyIndentation: Signature
+
+# Breaking
+BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: BeforeColon
+PackConstructorInitializers: NextLine
+
+# Misc
 InsertNewlineAtEOF: true
+InsertBraces: true
+RemoveSemicolon: true
+SeparateDefinitionBlocks: Always
