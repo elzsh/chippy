@@ -21,11 +21,22 @@ int main(int argc, char** argv) {
     // ~700Hz (1.4 milliseconds per instruction)
     auto delay = std::chrono::microseconds(1400);
 
-    while (true) {
-        chip8.tick();
+    /**
+      while (true) {
+      chip8.tick();
 
-        std::this_thread::sleep_for(delay);
-    }
+      std::this_thread::sleep_for(delay);
+      }
+     */
+
+    chip8.tick();
+    chip8.tick();
+    chip8.tick();
+    chip8.tick();
+    chip8.tick();
+    chip8.tick();
+    chip8.tick();
+    chip8.tick();
 
     return 0;
 }

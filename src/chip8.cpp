@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <ios>
 #include <iostream>
 
@@ -76,9 +75,38 @@ bool Chip8::load_rom(const std::filesystem::path& filepath) {
 void Chip8::tick() {
     opcode = memory[pc & 0x0FFF] << 8 | memory[(pc + 1) & 0x0FFF];
 
-    std::cout << std::hex << std::setfill('0') << std::setw(4) << opcode
-              << '\n';
-
-    pc += 2;
+    pc += 0x2;
     pc &= 0x0FFF;
+
+    uint8_t op = (opcode & 0xF000) >> 12;
+    uint8_t x = (opcode & 0x0F00) >> 8;
+    uint8_t y = (opcode & 0x00F0) >> 4;
+    uint8_t n = (opcode & 0x000F);
+    uint8_t nn = (opcode & 0x00FF);
+    uint16_t nnn = (opcode & 0x0FFF);
+
+    switch (op) {
+    case 0x0:
+        switch (opcode) {
+        case 0x00E0:
+            display.fill(0);
+            break;
+        }
+        break;
+    case 0x1:
+        pc = nnn;
+        break;
+    case 0x6:
+        registers[x] = nn;
+        break;
+    case 0x7:
+        registers[x] += nn;
+        break;
+    case 0xA:
+        index = nnn;
+        break;
+    case 0xD: {
+        break;
+    }
+    }
 }
