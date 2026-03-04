@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <ios>
+#include <random>
 
 namespace {
 constexpr std::array<uint8_t, 80> FONTSET = {
@@ -78,7 +79,7 @@ bool Chip8::load_rom(const std::filesystem::path& filepath) {
 void Chip8::tick() {
     opcode = memory[pc & 0x0FFF] << 8 | memory[(pc + 1) & 0x0FFF];
 
-    pc += 0x2;
+    pc += 0x02;
     pc &= 0x0FFF;
 
     uint8_t op = (opcode & 0xF000) >> 12;
@@ -89,30 +90,112 @@ void Chip8::tick() {
     uint16_t nnn = (opcode & 0x0FFF);
 
     switch (op) {
-        case 0x0:
+        case 0x00:
             switch (opcode) {
                 case 0x00E0:
                     display.fill(0);
                     break;
+                case 0x00EE:
+                    sp = (sp - 1) & 0x0F;
+                    pc = stack[sp];
+                    break;
             }
             break;
-        case 0x1:
+        case 0x01:
             pc = nnn;
             break;
-        case 0x6:
+        case 0x02:
+            stack[sp] = pc;
+            sp = (sp + 1) & 0x0F;
+            pc = nnn;
+            break;
+        case 0x03:
+            if (registers[x] == nn) {
+                pc += 0x02;
+            }
+            break;
+        case 0x04:
+            if (registers[x] != nn) {
+                pc += 0x02;
+            }
+            break;
+        case 0x05:
+            if (registers[x] == registers[y]) {
+                pc += 0x02;
+            }
+            break;
+        case 0x06:
             registers[x] = nn;
             break;
-        case 0x7:
+        case 0x07:
             registers[x] += nn;
             break;
-        case 0xA:
+        case 0x08:
+            switch (n) {
+                case 0x00:
+                    registers[x] = registers[y];
+                    break;
+                case 0x01:
+                    registers[x] = registers[x] | registers[y];
+                    break;
+                case 0x02:
+                    registers[x] = registers[x] & registers[y];
+                    break;
+                case 0x03:
+                    registers[x] = registers[x] ^ registers[y];
+                    break;
+                case 0x04: {
+                    uint16_t sum = registers[x] + registers[y];
+                    registers[x] = sum;
+                    registers[0x0F] = (sum > 0xFF) ? 0x01 : 0x00;
+                    break;
+                }
+                case 0x05: {
+                    uint8_t sub = registers[x] - registers[y];
+                    registers[0x0F] = registers[x] < registers[y] ? 0x01 : 0x00;
+                    registers[x] = sub;
+                    break;
+                }
+                case 0x06:
+                    registers[x] = registers[y] >> 0x01;
+                    registers[0x0F] = registers[y] & 0x01;
+                    break;
+                case 0x07: {
+                    uint8_t sub = registers[y] - registers[x];
+                    registers[0x0F] = registers[y] < registers[x] ? 0x01 : 0x00;
+                    registers[x] = sub;
+                    break;
+                }
+                case 0x0E:
+                    registers[x] = registers[y] << 0x01;
+                    registers[0x0F] = registers[y] & 0x80;
+                    break;
+            }
+            break;
+        case 0x09:
+            if (registers[x] != registers[y]) {
+                pc += 0x02;
+            }
+            break;
+        case 0x0A:
             index = nnn;
             break;
-        case 0xD: {
+        case 0x0B:
+            pc = nnn + registers[0x00];
+            break;
+        case 0x0C: {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<std::uint8_t> distrib(0, 255);
+
+            registers[x] = distrib(gen) & nn;
+            break;
+        }
+        case 0x0D: {
             uint8_t x_coord = registers[x] & (DISPLAY_WIDTH - 1);
             uint8_t y_coord = registers[y] & (DISPLAY_HEIGHT - 1);
 
-            registers[0xF] = 0x0;
+            registers[0xF] = 0x00;
 
             for (uint8_t i = 0; i < n; i++) {
                 if (y_coord + i >= DISPLAY_HEIGHT) {
