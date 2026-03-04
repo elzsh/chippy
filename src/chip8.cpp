@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <fstream>
 #include <ios>
-#include <iostream>
 
 namespace {
 constexpr std::array<uint8_t, 80> FONTSET = {
@@ -82,8 +81,8 @@ void Chip8::tick() {
     pc += 0x2;
     pc &= 0x0FFF;
 
-    uint8_t op = (opcode & 0xF000) >> 12;    // test
-    uint8_t x = (opcode & 0x0F00) >> 8;      // test
+    uint8_t op = (opcode & 0xF000) >> 12;
+    uint8_t x = (opcode & 0x0F00) >> 8;
     uint8_t y = (opcode & 0x00F0) >> 4;
     uint8_t n = (opcode & 0x000F);
     uint8_t nn = (opcode & 0x00FF);
@@ -110,6 +109,34 @@ void Chip8::tick() {
             index = nnn;
             break;
         case 0xD: {
+            uint8_t x_coord = registers[x] & (DISPLAY_WIDTH - 1);
+            uint8_t y_coord = registers[y] & (DISPLAY_HEIGHT - 1);
+
+            registers[0xF] = 0x0;
+
+            for (uint8_t i = 0; i < n; i++) {
+                if (y_coord + i >= DISPLAY_HEIGHT) {
+                    break;
+                }
+
+                uint8_t sprite_row = memory[(index + i) & 0x0FFF];
+
+                for (uint8_t j = 0; j < 8; j++) {
+                    if (x_coord + j >= DISPLAY_WIDTH) {
+                        break;
+                    }
+
+                    uint8_t sprite_px = (sprite_row >> (7 - j)) & 1;
+
+                    if (sprite_px) {
+                        size_t display_idx = (y_coord + i) * DISPLAY_WIDTH + (x_coord + j);
+
+                        registers[0xF] |= display[display_idx];
+
+                        display[display_idx] ^= 1;
+                    }
+                }
+            }
             break;
         }
     }
