@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <fstream>
 #include <ios>
-#include <random>
 
 namespace {
 constexpr std::array<uint8_t, 80> FONTSET = {
@@ -190,7 +189,7 @@ void Chip8::tick() {
             pc = nnn + registers[0x00];
             break;
         case 0x0C: {
-            registers[x] = rand_byte(rand_gen) & nn;
+            registers[x] = static_cast<uint8_t>(rand_byte(rand_gen)) & nn;
             break;
         }
         case 0x0D: {

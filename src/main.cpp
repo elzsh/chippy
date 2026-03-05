@@ -1,18 +1,24 @@
 #include <chip8.h>
 #include <chrono>
 #include <cstdlib>
+#include <ios>
 #include <iostream>
+#include <string>
 #include <thread>
 
 void render_terminal(const Chip8& chip8) {
-    std::cout << "\033[2J\033[1;1H";
+    static std::string buf;
+    buf.reserve(chip8.DISPLAY_WIDTH * chip8.DISPLAY_HEIGHT * 3 + 64);
+
+    buf.append("\033[2J\033[1;1H");
 
     for (size_t y = 0; y < chip8.DISPLAY_HEIGHT; y++) {
         for (size_t x = 0; x < chip8.DISPLAY_WIDTH; x++) {
-            std::cout << (+chip8.display[y * chip8.DISPLAY_WIDTH + x] ? "█" : " ");
+            buf.append(chip8.display[y * chip8.DISPLAY_WIDTH + x] ? "\u2588" : " ");
         }
-        std::cout << '\n';
+        buf.push_back('\n');
     }
+    std::cout.write(buf.data(), static_cast<std::streamsize>(buf.size()));
 }
 
 int main(int argc, char** argv) {
