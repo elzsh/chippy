@@ -45,7 +45,6 @@ void Chip8::reset() {
     std::copy(FONTSET.begin(), FONTSET.end(), memory.begin() + FONTSET_ADDRESS);
 }
 
-// Test
 Chip8::Chip8() : rand_gen(std::random_device{}()), rand_byte(0, 255) {
     reset();
 }
