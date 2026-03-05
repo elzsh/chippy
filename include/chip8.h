@@ -17,7 +17,7 @@ public:
 
     void reset();
 
-    bool load_rom(const std::filesystem::path& filepath);
+    [[nodiscard]] bool load_rom(const std::filesystem::path& filepath);
 
     void tick();
 
