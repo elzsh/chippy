@@ -1,4 +1,5 @@
-#include <chip8.h>
+#include "chip8.h"
+
 #include <chrono>
 #include <cstdlib>
 #include <ios>
@@ -8,6 +9,7 @@
 
 void render_terminal(const Chip8& chip8) {
     static std::string buf;
+    buf.clear();
     buf.reserve(chip8.DISPLAY_WIDTH * chip8.DISPLAY_HEIGHT * 3 + 64);
 
     buf.append("\033[2J\033[1;1H");
@@ -36,19 +38,20 @@ int main(int argc, char** argv) {
     }
 
     // ~700Hz (1.4 milliseconds per instruction)
-    auto cpu_delay = std::chrono::microseconds(1400);
+    auto next_tick = std::chrono::steady_clock::now();
+    constexpr auto tick_interval = std::chrono::microseconds(1400);
 
-    int cycle_count = 0;
+    uint64_t cycle_count = 0;
 
     while (true) {
         chip8.tick();
 
         if (++cycle_count % 11 == 0) {
             render_terminal(chip8);
+            chip8.tick_timers();
         }
 
-        std::this_thread::sleep_for(cpu_delay);
+        next_tick += tick_interval;
+        std::this_thread::sleep_until(next_tick);
     }
-
-    return 0;
 }

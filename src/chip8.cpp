@@ -1,7 +1,7 @@
+#include "chip8.h"
+
 #include <algorithm>
-#include <chip8.h>
 #include <fstream>
-#include <ios>
 
 namespace {
 constexpr std::array<uint8_t, 80> FONTSET = {
@@ -32,13 +32,12 @@ void Chip8::reset() {
     stack.fill(0);
 
     pc = START_ADDRESS;
-    opcode = 0;
     index = 0;
     sp = 0;
     delay_timer = 0;
     sound_timer = 0;
 
-    std::copy(FONTSET.begin(), FONTSET.end(), memory.begin() + FONTSET_ADDRESS);
+    std::ranges::copy(FONTSET, memory.begin() + FONTSET_ADDRESS);
 }
 
 Chip8::Chip8() : rand_gen(std::random_device{}()), rand_byte(0, 255) {
@@ -73,7 +72,7 @@ bool Chip8::load_rom(const std::filesystem::path& filepath) {
 }
 
 void Chip8::tick() {
-    opcode = memory[pc & 0x0FFF] << 8 | memory[(pc + 1) & 0x0FFF];
+    uint16_t opcode = memory[pc & 0x0FFF] << 8 | memory[(pc + 1) & 0x0FFF];
 
     pc += 0x02;
     pc &= 0x0FFF;
@@ -132,13 +131,13 @@ void Chip8::tick() {
                     registers[x] = registers[y];
                     break;
                 case 0x01:
-                    registers[x] = registers[x] | registers[y];
+                    registers[x] |= registers[y];
                     break;
                 case 0x02:
-                    registers[x] = registers[x] & registers[y];
+                    registers[x] &= registers[y];
                     break;
                 case 0x03:
-                    registers[x] = registers[x] ^ registers[y];
+                    registers[x] ^= registers[y];
                     break;
                 case 0x04: {
                     uint16_t sum = registers[x] + registers[y];
@@ -186,7 +185,7 @@ void Chip8::tick() {
             pc = nnn + registers[0x00];
             break;
         case 0x0C: {
-            registers[x] = static_cast<uint8_t>(rand_byte(rand_gen)) & nn;
+            registers[x] = rand_byte(rand_gen) & nn;
             break;
         }
         case 0x0D: {
@@ -240,14 +239,18 @@ void Chip8::tick() {
                     registers[x] = delay_timer;
                     break;
                 case 0x0A: {
-                    uint8_t key_pressed = 0x00;
+                    bool key_pressed = false;
                     for (uint8_t i = 0; i < keypad.size(); i++) {
                         if (keypad[i]) {
                             registers[x] = i;
-                            key_pressed = 0x01;
+                            key_pressed = true;
+                            break;
                         }
                     }
-                    pc -= key_pressed ? 0x00 : 0x02;
+
+                    if (!key_pressed) {
+                        pc -= 0x02;
+                    }
                     break;
                 }
                 case 0x15:
@@ -265,7 +268,7 @@ void Chip8::tick() {
                     break;
                 }
                 case 0x29:
-                    index = FONTSET_ADDRESS + ((registers[x] & 0x0F) * 0x05);
+                    index = (FONTSET_ADDRESS + ((registers[x] & 0x0F) * 0x05)) & 0x0FFF;
                     break;
                 case 0x33: {
                     memory[index & 0x0FFF] = registers[x] / 100;
@@ -285,5 +288,14 @@ void Chip8::tick() {
                     break;
             }
             break;
+    }
+}
+
+void Chip8::tick_timers() {
+    if (delay_timer > 0) {
+        delay_timer--;
+    }
+    if (sound_timer > 0) {
+        sound_timer--;
     }
 }
