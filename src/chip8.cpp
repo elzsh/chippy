@@ -151,25 +151,31 @@ void Chip8::tick() {
                     break;
                 }
                 case 0x05: {
+                    uint8_t flag = (registers[x] < registers[y]) ? 0x00 : 0x01;
                     uint8_t sub = registers[x] - registers[y];
-                    registers[0x0F] = registers[x] < registers[y] ? 0x00 : 0x01;
                     registers[x] = sub;
+                    registers[0x0F] = flag;
                     break;
                 }
-                case 0x06:
-                    registers[0x0F] = registers[x] & 0x01;
+                case 0x06: {
+                    uint8_t flag = registers[x] & 0x01;
                     registers[x] >>= 0x01;
-                    break;
-                case 0x07: {
-                    uint8_t sub = registers[y] - registers[x];
-                    registers[0x0F] = registers[y] < registers[x] ? 0x00 : 0x01;
-                    registers[x] = sub;
+                    registers[0x0F] = flag;
                     break;
                 }
-                case 0x0E:
-                    registers[0x0F] = (registers[x] & 0x80) >> 7;
-                    registers[x] <<= 0x01;
+                case 0x07: {
+                    uint8_t flag = (registers[y] < registers[x]) ? 0x00 : 0x01;
+                    uint8_t sub = registers[y] - registers[x];
+                    registers[x] = sub;
+                    registers[0x0F] = flag;
                     break;
+                }
+                case 0x0E: {
+                    uint8_t flag = (registers[x] & 0x80) >> 7;
+                    registers[x] <<= 0x01;
+                    registers[0x0F] = flag;
+                    break;
+                }
             }
             break;
         case 0x09:
