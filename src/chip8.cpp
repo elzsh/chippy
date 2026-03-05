@@ -45,7 +45,7 @@ void Chip8::reset() {
     std::copy(FONTSET.begin(), FONTSET.end(), memory.begin() + FONTSET_ADDRESS);
 }
 
-Chip8::Chip8() {
+Chip8::Chip8() : rand_gen(std::random_device{}()), rand_byte(0, 255) {
     reset();
 }
 
@@ -152,23 +152,23 @@ void Chip8::tick() {
                 }
                 case 0x05: {
                     uint8_t sub = registers[x] - registers[y];
-                    registers[0x0F] = registers[x] < registers[y] ? 0x01 : 0x00;
+                    registers[0x0F] = registers[x] < registers[y] ? 0x00 : 0x01;
                     registers[x] = sub;
                     break;
                 }
                 case 0x06:
-                    registers[x] = registers[y] >> 0x01;
-                    registers[0x0F] = registers[y] & 0x01;
+                    registers[0x0F] = registers[x] & 0x01;
+                    registers[x] >>= 0x01;
                     break;
                 case 0x07: {
                     uint8_t sub = registers[y] - registers[x];
-                    registers[0x0F] = registers[y] < registers[x] ? 0x01 : 0x00;
+                    registers[0x0F] = registers[y] < registers[x] ? 0x00 : 0x01;
                     registers[x] = sub;
                     break;
                 }
                 case 0x0E:
-                    registers[x] = registers[y] << 0x01;
-                    registers[0x0F] = registers[y] & 0x80;
+                    registers[0x0F] = (registers[x] & 0x80) >> 7;
+                    registers[x] <<= 0x01;
                     break;
             }
             break;
@@ -184,11 +184,7 @@ void Chip8::tick() {
             pc = nnn + registers[0x00];
             break;
         case 0x0C: {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<std::uint8_t> distrib(0, 255);
-
-            registers[x] = distrib(gen) & nn;
+            registers[x] = rand_byte(rand_gen) & nn;
             break;
         }
         case 0x0D: {
@@ -222,5 +218,70 @@ void Chip8::tick() {
             }
             break;
         }
+        case 0x0E:
+            switch (nn) {
+                case 0x9E:
+                    if (keypad[registers[x] & 0x0F]) {
+                        pc += 0x02;
+                    }
+                    break;
+                case 0xA1:
+                    if (!keypad[registers[x] & 0x0F]) {
+                        pc += 0x02;
+                    }
+                    break;
+            }
+            break;
+        case 0x0F:
+            switch (nn) {
+                case 0x07:
+                    registers[x] = delay_timer;
+                    break;
+                case 0x0A: {
+                    uint8_t key_pressed = 0x00;
+                    for (uint8_t i = 0; i < keypad.size(); i++) {
+                        if (keypad[i]) {
+                            registers[x] = i;
+                            key_pressed = 0x01;
+                        }
+                    }
+                    pc -= key_pressed ? 0x00 : 0x02;
+                    break;
+                }
+                case 0x15:
+                    delay_timer = registers[x];
+                    break;
+                case 0x18:
+                    sound_timer = registers[x];
+                    break;
+                case 0x1E: {
+                    uint16_t sum = index + registers[x];
+                    index = sum;
+
+                    // If overflows above addressable range set carry flag
+                    registers[0x0F] = (sum > 0x0FFF) ? 0x01 : 0x00;
+                    break;
+                }
+                case 0x29:
+                    index = FONTSET_ADDRESS + ((registers[x] & 0x0F) * 0x05);
+                    break;
+                case 0x33: {
+                    memory[index & 0x0FFF] = registers[x] / 100;
+                    memory[(index + 1) & 0x0FFF] = (registers[x] / 10) % 10;
+                    memory[(index + 2) & 0x0FFF] = registers[x] % 10;
+                    break;
+                }
+                case 0x55:
+                    for (uint8_t i = 0x00; i <= x; i++) {
+                        memory[(index + i) & 0x0FFF] = registers[i];
+                    }
+                    break;
+                case 0x65:
+                    for (uint8_t i = 0x00; i <= x; i++) {
+                        registers[i] = memory[(index + i) & 0x0FFF];
+                    }
+                    break;
+            }
+            break;
     }
 }

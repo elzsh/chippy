@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <random>
 
 class Chip8 {
 public:
@@ -36,4 +37,7 @@ private:
 
     uint8_t delay_timer{};
     uint8_t sound_timer{};
+
+    std::mt19937 rand_gen;
+    std::uniform_int_distribution<uint8_t> rand_byte;
 };
