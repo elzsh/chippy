@@ -54,3 +54,5 @@ compile_commands.json
 
 # ROMs
 roms/
+
+.clang-format
