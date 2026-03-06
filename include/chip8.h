@@ -25,6 +25,7 @@ public:
     std::array<uint8_t, 16> keypad{};
 
     std::array<uint8_t, DISPLAY_WIDTH * DISPLAY_HEIGHT> display{};
+    uint8_t draw_flag{};
 
 private:
     uint16_t pc{START_ADDRESS};

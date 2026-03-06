@@ -46,8 +46,12 @@ int main(int argc, char** argv) {
     while (true) {
         chip8.tick();
 
-        if (++cycle_count % 11 == 0) {
+        if (chip8.draw_flag) {
             render_terminal(chip8);
+            chip8.draw_flag = 0x00;
+        }
+
+        if (++cycle_count % 11 == 0) {
             chip8.tick_timers();
         }
 

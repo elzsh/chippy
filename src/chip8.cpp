@@ -88,6 +88,7 @@ void Chip8::tick() {
         case 0x00:
             switch (opcode) {
                 case 0x00E0:
+                    draw_flag = 0x01;
                     display.fill(0);
                     break;
                 case 0x00EE:
@@ -213,6 +214,7 @@ void Chip8::tick() {
 
                         registers[0xF] |= display[display_idx];
 
+                        draw_flag = 0x01;
                         display[display_idx] ^= 1;
                     }
                 }
